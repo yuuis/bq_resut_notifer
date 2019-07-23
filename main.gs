@@ -1,4 +1,5 @@
-var projectId = "{PROJECT_ID}";
+var scriptProp = PropertiesService.getScriptProperties();
+var projectId = scriptProp.getProperty("project_id");
 
 function main() {
   var result = query("{QUERY}");
@@ -34,30 +35,30 @@ function notify(result) {
 }
 
 function postToSlack(text) {
-    var url = "{WEBHOOK_URL}";
-    var username = "BQの結果を教えるくん";
-    var icon = ":cat:";
+  var url = scriptProp.getProperty("slack_webhook_url");
+  var username = "BQの結果を教えるくん";
+  var icon = ":cat:";
 
-    var payload = JSON.stringify({
-      "username" : username,
-      "icon_emoji": icon,
-      "text" : text
-    });
+  var payload = JSON.stringify({
+    "username" : username,
+    "icon_emoji": icon,
+    "text" : text
+  });
 
-    var params = {
-      "method" : "post",
-      "contentType" : "application/json",
-      "payload" : payload
-    };
+  var params = {
+    "method" : "post",
+    "contentType" : "application/json",
+    "payload" : payload
+  };
 
-    UrlFetchApp.fetch(url, params);
+  UrlFetchApp.fetch(url, params);
 }
 
 function getService() {
   return OAuth2.createService("bigquery")
     .setTokenUrl("https://accounts.google.com/o/oauth2/token")
-    .setPrivateKey("{PRIVATE_KEY}")
-    .setIssuer("{CLIENT_EMAIL}")
+    .setPrivateKey(scriptProp.getProperty("private_key"))
+    .setIssuer(scriptProp.getProperty("service_account_email"))
     .setPropertyStore(PropertiesService.getScriptProperties())
     .setScope("https://www.googleapis.com/auth/bigquery");
 }
